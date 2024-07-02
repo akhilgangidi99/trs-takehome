@@ -3,7 +3,7 @@
 To run this script, please execute the following command:
 
 ```python
-python weekday_counter.py <start_date> <end_date>
+python3 weekday_counter.py <start_date> <end_date>
 ```
 
 > Please note that the dates must be in MM-DD-YYYY format
