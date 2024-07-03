@@ -8,13 +8,17 @@ def weekday_counter(start_date, end_date):
     except ValueError:
         raise ValueError("Dates must be in MM-DD-YYYY format")
 
-    weekday_count = 0
-    current_date = start_date
+    total_days = (end_date - start_date).days + 1
+    full_weeks = total_days // 7
 
-    while current_date <= end_date:
-        if current_date.weekday() < 5:
+    weekday_count = full_weeks * 5
+
+    remaining_days = total_days % 7
+    
+    for i in range(remaining_days):
+        current_day = start_date + timedelta(days=full_weeks * 7 + i)
+        if current_day.weekday() < 5:
             weekday_count += 1
-        current_date += timedelta(days=1)
     
     return weekday_count
 
