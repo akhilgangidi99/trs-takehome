@@ -11,6 +11,19 @@ def days_in_month(month, year):
     else:
         return 31
 
+def days_from_start_of_year(day, month, year):
+    days = day
+    for m in range(1, month):
+        days += days_in_month(m, year)
+    return days
+
+def days_since_reference_date(day, month, year):
+    days = 0
+    for y in range(1, year):
+        days += 366 if is_leap_year(y) else 365
+    days += days_from_start_of_year(day, month, year)
+    return days
+
 def zellers_congruence(day, month, year):
     if month < 3:
         month += 12
@@ -20,33 +33,26 @@ def zellers_congruence(day, month, year):
     f = day + ((13 * (month + 1)) // 5) + K + (K // 4) + (J // 4) - (2 * J)
     return (f % 7 + 7) % 7
 
-def is_weekday(day, month, year):
-    day_of_week = zellers_congruence(day, month, year)
-    return day_of_week not in [0, 1]
-
-def increment_date(day, month, year):
-    day += 1
-    if day > days_in_month(month, year):
-        day = 1
-        month += 1
-        if month > 12:
-            month = 1
-            year += 1
-    return day, month, year
-
 def count_weekdays(start_date, end_date):
     start_month, start_day, start_year = map(int, start_date.split('-'))
     end_month, end_day, end_year = map(int, end_date.split('-'))
 
-    weekday_count = 0
-    current_month, current_day, current_year = start_month, start_day, start_year
+    days_start = days_since_reference_date(start_day, start_month, start_year)
+    days_end = days_since_reference_date(end_day, end_month, end_year)
 
-    while (current_year, current_month, current_day) <= (end_year, end_month, end_day):
-        if is_weekday(current_day, current_month, current_year):
-            weekday_count += 1
-        current_day, current_month, current_year = increment_date(current_day, current_month, current_year)
+    total_days = days_end - days_start + 1
+    full_weeks = total_days // 7
+    weekdays = full_weeks * 5
 
-    return weekday_count
+    remaining_days = total_days % 7
+    start_weekday = zellers_congruence(start_day, start_month, start_year)
+
+    for i in range(remaining_days):
+        if start_weekday > 1:
+            weekdays += 1
+        start_weekday = (start_weekday + 1) % 7
+
+    return weekdays
 
 def main():
     parser = argparse.ArgumentParser(description='Weekday count between two dates')
