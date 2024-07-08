@@ -11,17 +11,12 @@ def days_in_month(month, year):
     else:
         return 31
 
-def days_from_start_of_year(day, month, year):
-    days = day
-    for m in range(1, month):
-        days += days_in_month(m, year)
-    return days
-
-def days_since_reference_date(day, month, year):
-    days = 0
-    for y in range(1, year):
-        days += 366 if is_leap_year(y) else 365
-    days += days_from_start_of_year(day, month, year)
+def days_until_date(day, month, year):
+    days = day + 365 * (year - 1) + (year - 1) // 4 - (year - 1) // 100 + (year - 1) // 400
+    month_days = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
+    days += month_days[month - 1]
+    if month > 2 and is_leap_year(year):
+        days += 1
     return days
 
 def zellers_congruence(day, month, year):
@@ -37,8 +32,8 @@ def count_weekdays(start_date, end_date):
     start_month, start_day, start_year = map(int, start_date.split('-'))
     end_month, end_day, end_year = map(int, end_date.split('-'))
 
-    days_start = days_since_reference_date(start_day, start_month, start_year)
-    days_end = days_since_reference_date(end_day, end_month, end_year)
+    days_start = days_until_date(start_day, start_month, start_year)
+    days_end = days_until_date(end_day, end_month, end_year)
 
     total_days = days_end - days_start + 1
     full_weeks = total_days // 7
@@ -57,7 +52,7 @@ def count_weekdays(start_date, end_date):
 def main():
     parser = argparse.ArgumentParser(description='Weekday count between two dates')
     parser.add_argument("start_date", type=str, help='Enter a start date in MM-DD-YYYY format')
-    parser.add_argument("end_date", type=str, help='Enter a end date in MM-DD-YYYY format')
+    parser.add_argument("end_date", type=str, help='Enter an end date in MM-DD-YYYY format')
 
     args = parser.parse_args()
     start_date = args.start_date
